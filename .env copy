@@ -1,0 +1,6 @@
+COMPOSE_PROJECT_NAME=project
+
+DB=db
+DBUSER=user
+DBPASS=User.1234
+DBHOST=db

@@ -1,28 +1,47 @@
-version: '3.1'
-services:
+version: '3.7'
+services:  
   db:
-    image: mysql:5.7
-    user: root
+    image: mariadb
     restart: always
+    hostname: ${DBHOST}
     environment:
-      MYSQL_DATABASE: exampledb
-      MYSQL_USER: exampleuser
-      MYSQL_PASSWORD: examplepass
+      MYSQL_DATABASE: ${DB}
+      MYSQL_USER: ${DBUSER}
+      MYSQL_PASSWORD: ${DBPASS}
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
-      - ./data/db:/var/lib/mysql
+      - db1:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8181:8080
+    depends_on:
+      - db
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8180:80
+    environment:
+      - PMA_ARBITRARY=1
+    depends_on:
+      - db
   wordpress:
-    build: wordpressdocker
-    user: root
+    image: wordpress
     restart: always
     ports:
       - 80:80
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: exampleuser
-      WORDPRESS_DB_PASSWORD: examplepass
-      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DB_HOST: ${DBHOST}
+      WORDPRESS_DB_USER: ${DBUSER}
+      WORDPRESS_DB_PASSWORD: ${DBPASS}
+      WORDPRESS_DB_NAME: ${DB}
+      WORDPRESS_TABLE_PREFIX: ${COMPOSE_PROJECT_NAME}
     depends_on:
       - db
     volumes:
-      - ./data/wordpress:/var/www/html
+      - web1:/var/www/html
+volumes:
+  web1:
+  db1:
